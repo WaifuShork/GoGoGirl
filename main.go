@@ -20,6 +20,14 @@ import (
 type Config struct {
 	Token  string `json:"token"`
 	Prefix string `json:"prefix"`
+
+	AdministratorId uint64 `json:"administratorId"` 
+	ModeratorId     uint64 `json:"moderatorId"`
+}
+
+type Command struct { 
+	Name  string
+	Value interface{}
 }
 
 var Token string
@@ -65,31 +73,45 @@ func run() {
 }
 
 func messageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {
+
+	config, err := readConfig("_config.json")
+	if err != nil { 
+		fmt.Println("unable to parse config for command context.")
+		return
+	}
+
 	if message.Author.ID == session.State.User.ID { 
 		return
 	}
 
-	if message.Content == "ping" {
-		fmt.Println(message.Content) 
-		fmt.Println(message.ChannelID) 
-		//return "pong"
-		session.ChannelMessageSend(message.Content, "Pong")
-	}
-
-	if message.Content == "pong" { 
-		fmt.Println(message.Content)
-		fmt.Println(message.ChannelID) 
-		//return "ping"
-		session.ChannelMessageSend(message.ChannelID, "Pong")
-	}
-	//session.ChannelMessageSend(message.ChannelID, handleCommand(message.Content, "-")) 
+	msg := parseCommand(message.Content, config)
+	session.ChannelMessageSend(message.ChannelID, msg) 
 }
 
-func handleCommand(message, prefix string) (string) { 
-	if strings.HasPrefix(message, prefix) {
-		
+func parseCommand(message string, config Config) (string) { 
+	commands := make(map[string]Command)
+
+	commands["ping"] = Command{Name: "ping", Value: "pong"}
+	commands["pong"] = Command{Name: "pong", Value: "ping"}
+	commands["modId"] = Command{Name: "modId", Value: config.ModeratorId}
+	commands["adId"] = Command{Name: "adId", Value: config.AdministratorId}
+
+	// Trim the prefix since we only need the raw message contents.
+	noPrefix := strings.TrimPrefix(message, config.Prefix)
+
+	for range commands { 
+		if commands[noPrefix].Name == noPrefix { 
+			fmt.Println(commands[noPrefix].Value)
+			return fmt.Sprintf("%v", commands[noPrefix].Value)
+		}
 	}
-	return ""
+
+	// sprintf the value since it's 'interface{}'.
+	value := fmt.Sprintf("%v", commands[noPrefix].Value)
+	fmt.Println("Command Name: " + commands[noPrefix].Name, "Command Value: " + value)
+
+	// return the users message in full without the prefix, for error reporting. 
+	return noPrefix;
 }
 
 func readConfig(cfgPath string) (Config, error) {
