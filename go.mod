@@ -3,7 +3,9 @@ module GoGoGirl
 go 1.16
 
 require (
-	github.com/bwmarrin/discordgo v0.23.2 // indirect
-	golang.org/x/sys v0.0.0-20210503080704-8803ae5d1324 // indirect
-	github.com/fsnotify/fsnotify v1.4.7
+	github.com/bwmarrin/discordgo v0.23.2 // direct
+	github.com/dustin/go-humanize v1.0.0 // direct
+	github.com/robertkrimen/otto v0.0.0-20200922221731-ef014fd054ac // direct
+	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32 // direct
 )

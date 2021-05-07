@@ -1,4 +1,8 @@
 {
-    "token": "insert-token",
-    "prefix": "insert-prefix"
+    "prefix": "1",
+    "bot_token": "bot-token",
+    "owner_id": "server-owner-id",
+    "use_sharding": false,
+    "shard_id": 0,
+    "shard_count": 1
 }
